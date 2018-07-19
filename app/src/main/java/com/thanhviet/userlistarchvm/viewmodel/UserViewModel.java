@@ -2,34 +2,35 @@ package com.thanhviet.userlistarchvm.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
-import android.util.Log;
-import com.thanhviet.userlistarchvm.R;
-import com.thanhviet.userlistarchvm.model.User;
-import java.util.ArrayList;
+import android.support.annotation.Nullable;
+import com.thanhviet.userlistarchvm.BaseApp;
+import com.thanhviet.userlistarchvm.db.entity.UserEntity;
 import java.util.List;
 
 public class UserViewModel extends AndroidViewModel {
-    private List<User> userList;
+    private final MediatorLiveData<List<UserEntity>> mObservableUsers;
 
     public UserViewModel(@NonNull Application application) {
         super(application);
-        if (userList == null) {
-            setupUserList();
-        }
+        mObservableUsers = new MediatorLiveData<>();
+        mObservableUsers.setValue(null);
+
+        LiveData<List<UserEntity>> products = BaseApp.getInstance().getRepository().getUserEntity();
+
+        // observe the changes of the products from the database and forward them
+        mObservableUsers.addSource(products, new Observer<List<UserEntity>>() {
+            @Override
+            public void onChanged(@Nullable List<UserEntity> userEntities) {
+                mObservableUsers.setValue(userEntities);
+            }
+        });
     }
 
-    public List<User> getUserList() {
-        return userList;
-    }
-
-    private void setupUserList() {
-        userList = new ArrayList<>();
-        userList.add(new User("Khahoo Ajish", "Front-End Developer", R.drawable.khahoo));
-        userList.add(new User("John Covey", "Back-End Developer", R.drawable.john));
-        userList.add(new User("Loges Vamber", "iOS Developer", R.drawable.loges));
-        userList.add(new User("Jung Kim Bap", "Android Developer", R.drawable.jung));
-        userList.add(new User("Seeng Luse", "AI Developer", R.drawable.seeng));
-        Log.i("UserViewModel", "setupUserList: ---------> size: "+userList.size());
+    public LiveData<List<UserEntity>> getUserList() {
+        return mObservableUsers;
     }
 }
