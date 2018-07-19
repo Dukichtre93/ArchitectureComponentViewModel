@@ -1,14 +1,17 @@
 package com.thanhviet.userlistarchvm;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import com.thanhviet.userlistarchvm.adapter.UserAdapter;
 import com.thanhviet.userlistarchvm.databinding.ActivityMainBinding;
+import com.thanhviet.userlistarchvm.db.entity.UserEntity;
 import com.thanhviet.userlistarchvm.model.User;
 import com.thanhviet.userlistarchvm.viewmodel.UserViewModel;
 import java.util.ArrayList;
@@ -31,22 +34,23 @@ public class MainActivity extends AppCompatActivity {
         // Comment it when use Architecture Components ViewModel
         //        mAdapter.setUserList(loadUsers());
         final UserViewModel userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
-        mAdapter.setUserList(userViewModel.getUserList());
+        subscribeUi(userViewModel);
     }
 
-    /**
-     * You only use this method when
-     * You want to check rotation screen
-     */
-    private List<User> loadUsers() {
-        List<User> userList = new ArrayList<>();
-        userList.add(new User("Khahoo Ajish", "Front-End Developer", R.drawable.khahoo));
-        userList.add(new User("John Covey", "Back-End Developer", R.drawable.john));
-        userList.add(new User("Loges Vamber", "iOS Developer", R.drawable.loges));
-        userList.add(new User("Jung Kim Bap", "Android Developer", R.drawable.jung));
-        userList.add(new User("Seeng Luse", "AI Developer", R.drawable.seeng));
-        //Log for easily see
-        Log.i("MainActivity", "loadUsers: ---------> size:" + userList.size());
-        return userList;
+    private void subscribeUi(UserViewModel viewModel) {
+        // Update the list when the data changes
+        viewModel.getUserList().observe(this, new Observer<List<UserEntity>>() {
+            @Override
+            public void onChanged(@Nullable List<UserEntity> userEntities) {
+                if (userEntities != null) {
+//                    mBinding.setIsLoading(false);
+                    mAdapter.setUserList(userEntities);
+                }
+                // espresso does not know how to wait for data binding's loop so we execute changes
+                // sync.
+                mBinding.executePendingBindings();
+            }
+        });
     }
+
 }

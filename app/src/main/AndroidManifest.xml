@@ -3,6 +3,7 @@
     package="com.thanhviet.userlistarchvm">
 
     <application
+        android:name=".BaseApp"
         android:allowBackup="true"
         android:icon="@drawable/logo_app"
         android:label="@string/app_name"

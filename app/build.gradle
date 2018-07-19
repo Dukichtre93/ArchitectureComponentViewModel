@@ -37,4 +37,12 @@ dependencies {
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     implementation 'android.arch.lifecycle:runtime:1.1.1'
     annotationProcessor 'android.arch.lifecycle:compiler:1.1.1'
+
+    //Room
+    implementation "android.arch.persistence.room:runtime:$rootProject.room_version"
+    annotationProcessor "android.arch.persistence.room:compiler:$rootProject.room_version"
+
+    //Lifecycle
+    implementation "android.arch.lifecycle:extensions:$rootProject.lifecycle_version"
+    annotationProcessor "android.arch.lifecycle:compiler:$rootProject.lifecycle_version"
 }
